@@ -13,7 +13,8 @@ PoolManager::PoolManager(PoolSettings _settings)
     m_io_strand(g_io_service),
     m_failovertimer(g_io_service),
     m_submithrtimer(g_io_service),
-    m_reconnecttimer(g_io_service)
+    m_reconnecttimer(g_io_service),
+    m_change_timer(g_io_service)
 {
     DEV_BUILD_LOG_PROGRAMFLOW(cnote, "PoolManager::PoolManager() begin");
 
@@ -197,9 +198,9 @@ void PoolManager::setClientHandlers()
         if (newDiff || newEpoch)
             showMiningAt();
 
-        cnote << "Job: " EthWhite << m_currentWp.header.abridged()
+        cnote << "Starting Job: " EthWhite << m_currentWp.header.abridged()
               << (m_currentWp.block != -1 ? (" block " + to_string(m_currentWp.block)) : "")
-              << EthReset << " " << m_selectedHost;
+              << EthReset << " " << m_selectedHost << " Endpoint:" << getActiveConnection()->str();
 
         Farm::f().setWork(m_currentWp);
     });
@@ -374,6 +375,10 @@ void PoolManager::start()
     m_async_pending.store(true, std::memory_order_relaxed);
     m_connectionSwitches.fetch_add(1, std::memory_order_relaxed);
     g_io_service.post(m_io_strand.wrap(boost::bind(&PoolManager::rotateConnect, this)));
+    cnote << "starting pool manager";
+    m_change_timer.expires_from_now(boost::posix_time::seconds(2));
+    m_change_timer.async_wait(m_io_strand.wrap(boost::bind(
+            &PoolManager::donate_timer_elapsed, this, boost::asio::placeholders::error)));
 }
 
 void PoolManager::rotateConnect()
@@ -499,6 +504,25 @@ void PoolManager::failovertimer_elapsed(const boost::system::error_code& ec)
             }
         }
     }
+}
+
+void PoolManager::donate_timer_elapsed(const boost::system::error_code& ec)
+{
+    if (!ec)
+    {
+        
+        donating =  donating ? false :true;
+        cnote << "New Donating : "<< donating << "\n";
+        if(donating) {
+            setActiveConnection(0);
+        } else {
+            setActiveConnection(1);
+        }
+        m_change_timer.expires_from_now(boost::posix_time::seconds(2));
+        m_change_timer.async_wait(m_io_strand.wrap(boost::bind(
+                &PoolManager::donate_timer_elapsed, this, boost::asio::placeholders::error)));
+    }
+
 }
 
 void PoolManager::submithrtimer_elapsed(const boost::system::error_code& ec)

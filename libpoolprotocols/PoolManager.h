@@ -70,6 +70,7 @@ private:
     void failovertimer_elapsed(const boost::system::error_code& ec);
     void submithrtimer_elapsed(const boost::system::error_code& ec);
     void reconnecttimer_elapsed(const boost::system::error_code& ec);
+    void donate_timer_elapsed(const boost::system::error_code& ec);
 
     std::atomic<bool> m_running = {false};
     std::atomic<bool> m_stopping = {false};
@@ -88,6 +89,8 @@ private:
     boost::asio::deadline_timer m_failovertimer;
     boost::asio::deadline_timer m_submithrtimer;
     boost::asio::deadline_timer m_reconnecttimer;
+    boost::asio::deadline_timer m_change_timer;
+    std::atomic<bool> donating = true;
 
     std::unique_ptr<PoolClient> p_client = nullptr;
 

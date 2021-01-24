@@ -25,7 +25,7 @@ set(PROJECT_VERSION 0.19.0)
 cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release RelWithDebInfo)
 
 option(ETHASHCL "Build with OpenCL mining" ON)
-option(ETHASHCUDA "Build with CUDA mining" ON)
+option(ETHASHCUDA "Build with CUDA mining" OFF)
 option(ETHASHCPU "Build with CPU mining (only for development)" OFF)
 option(ETHDBUS "Build with D-Bus support" OFF)
 option(APICORE "Build with API Server support" ON)
@@ -95,6 +95,8 @@ include(EthCompilerSettings)
 if(UNIX AND NOT APPLE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
 endif()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  /VERBOSE:LIB")
+message("Linker options                     ${CMAKE_EXE_LINKER_FLAGS}")
 
 cable_add_buildinfo_library(PROJECT_NAME ${PROJECT_NAME})
 

@@ -25,6 +25,7 @@
 #include <libpoolprotocols/PoolURI.h>
 
 using namespace dev;
+using namespace std;
 
 struct SchemeAttributes
 {
@@ -129,9 +130,12 @@ URI::URI(std::string uri, bool _sim) : m_uri{std::move(uri)}
 
     // Split scheme and authoority
     // Authority MUST be valued
+    cout<< "Match 0 is:" << matches[0].str() << "\n";
     m_scheme = matches[1].str();
+    cout<< "Scheme is:" << m_scheme << "\n";
     boost::algorithm::to_lower(m_scheme);
     m_authority = matches[2].str();
+    cout<< "Authority is:" << m_scheme << "\n";
 
     // Missing authority is not possible
     if (m_authority.empty())
@@ -152,6 +156,8 @@ URI::URI(std::string uri, bool _sim) : m_uri{std::move(uri)}
     {
         m_userinfo = matches[1].str();
         m_urlinfo = matches[2].str();
+        cout<< "m_userinfo is:" <<m_userinfo << "\n";
+        cout<< "m_urlinfo is:" <<m_urlinfo << "\n";
     }
     else
     {
